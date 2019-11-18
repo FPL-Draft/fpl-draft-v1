@@ -1,12 +1,10 @@
 module.exports = (sequelize, type) => {
-  return sequelize.define('team', {
+  return sequelize.define('pick', {
     id: {
       type: type.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
-    team_id: type.INTEGER,
-    entry_id: type.INTEGER,
-    name: type.STRING,
+    player_id: type.INTEGER
   });
 };
