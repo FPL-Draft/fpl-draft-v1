@@ -21,6 +21,11 @@ MatchResult.belongsTo(Team);
 MatchResult.belongsTo(Match);
 Team.hasMany(MatchResult);
 MatchResult.hasMany(Pick);
+MatchResult.hasOne(MatchResult, {
+  as: 'opponent',
+  foreignKey: 'matchId',
+  sourceKey: 'matchId'
+})
 
 if (process.env.DUMP) {
   sequelize.sync({ force: true })

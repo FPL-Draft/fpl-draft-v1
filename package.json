@@ -10,6 +10,7 @@
     "import:matches": "import=matches node import",
     "import:players": "import=players node import",
     "import:gw": "import=gw node import",
+    "import:test": "import=test node import",
     "database:refresh": "DUMP=true node ./db/database",
     "start": "node index"
   },

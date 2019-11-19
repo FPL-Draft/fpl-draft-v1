@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { Op } = require('sequelize');
 const { sequelize, Team, Match, MatchResult, Player, Pick } = require('./db/database');
 
 
@@ -91,4 +92,35 @@ if (process.env.import === 'gw') {
         }
       })
     })
+}
+
+if (process.env.import === 'test') {
+  MatchResult.findAll({
+    include: [
+      {
+        model: Team
+      },
+      {
+        model: MatchResult,
+        as: 'opponent',
+        where: {
+          id: {
+            [Op.ne]: sequelize.col('match_result.id')
+          }
+        },
+        include: [
+          {
+            model: Team
+          }
+        ]
+      }
+    ],
+    where: {
+      points: { [Op.gt]: 0 }
+    }
+  }).then(matchResults => {
+    matchResults.map(result => {
+      console.log(`${result.team.name}(${result.points}) vs ${result.opponent.team.name}(${result.opponent.points})`);
+    })
+  })
 }
