@@ -1,5 +1,5 @@
 module.exports = (sequelize, type) => {
-  return sequelize.define('player', {
+  const Player = sequelize.define('Player', {
     id: {
       type: type.INTEGER,
       primaryKey: true,
@@ -11,5 +11,13 @@ module.exports = (sequelize, type) => {
     goals: type.INTEGER,
     first_name: type.STRING,
     second_name: type.STRING
+  }, {
+
   });
+
+  Player.associate = ({ Player, Pick }) => {
+    Player.hasMany(Pick);
+  }
+
+  return Player;
 };

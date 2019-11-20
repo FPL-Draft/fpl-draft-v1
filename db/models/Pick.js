@@ -1,10 +1,17 @@
 module.exports = (sequelize, type) => {
-  return sequelize.define('pick', {
+  const Pick = sequelize.define('Pick', {
     id: {
       type: type.INTEGER,
       primaryKey: true,
       autoIncrement: true
-    },
-    player_id: type.INTEGER
+    }
+  }, {
+
   });
+
+  Pick.associate = ({ Pick, Player }) => {
+    Pick.belongsTo(Player);
+  }
+
+  return Pick;
 };

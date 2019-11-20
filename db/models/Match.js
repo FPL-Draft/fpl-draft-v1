@@ -1,5 +1,5 @@
 module.exports = (sequelize, type) => {
-  return sequelize.define('match', {
+  const Match = sequelize.define('Match', {
     id: {
       type: type.INTEGER,
       primaryKey: true,
@@ -7,5 +7,17 @@ module.exports = (sequelize, type) => {
     },
     gameweek: type.INTEGER,
     finished: type.BOOLEAN
+  }, {
+    defaultScope: {
+      where: {
+        finished: true
+      }
+    }
   });
+
+  Match.associate = ({ Match, MatchResult }) => {
+    Match.hasMany(MatchResult);
+  }
+
+  return Match;
 };

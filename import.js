@@ -1,6 +1,11 @@
 const axios = require('axios');
 const { Op } = require('sequelize');
-const { sequelize, Team, Match, MatchResult, Player, Pick } = require('./db/database');
+// const { sequelize, Team, Match, MatchResult, Player, Pick } = require('./db');
+const { MatchResult, Match, Team, Player, Pick } = require('./db/models');
+
+if (process.env.import === 'test') {
+
+}
 
 
 axios.get('https://draft.premierleague.com/api/league/35400/details')
@@ -27,9 +32,10 @@ axios.get('https://draft.premierleague.com/api/league/35400/details')
           })
           MatchResult.create({
             points: fplMatch.league_entry_1_points,
-            teamId: homeTeam.id,
-            matchId: match.id
+            TeamId: homeTeam.id,
+            MatchId: match.id
           })
+
           const awayTeam = await Team.findOne({
             where: {
               team_id: fplMatch.league_entry_2
@@ -37,8 +43,8 @@ axios.get('https://draft.premierleague.com/api/league/35400/details')
           })
           MatchResult.create({
             points: fplMatch.league_entry_2_points,
-            teamId: awayTeam.id,
-            matchId: match.id
+            TeamId: awayTeam.id,
+            MatchId: match.id
           })
         })
       });
@@ -69,58 +75,26 @@ if (process.env.import === 'players') {
 }
 
 if (process.env.import === 'gw') {
-  MatchResult.findAll()
+  MatchResult.scope('withTeamAndMatch').findAll()
     .then(async matchResults => {
-      await matchResults.map(async matchResult => {
-        const team = await matchResult.getTeam();
-        const match = await matchResult.getMatch();
-        console.log(`Team: ${team.entry_id} - Gameweek: ${match.gameweek}`);
-        if (matchResult.points > 0) {
-          axios.get(`https://draft.premierleague.com/api/entry/${team.entry_id}/event/${match.gameweek}`)
-            .then(async response => {
-              const { picks, subs } = response.data;
-              picks.map(pick => {
-                Pick.create({
-                  player_id: pick.element,
-                  matchResultId: matchResult.id
-                });
+      await matchResults.map(result => {
+        const { Team, Match } = result;
+        console.log(`Team: ${Team.entry_id} - Gameweek: ${Match.gameweek}`);
+
+        axios.get(`https://draft.premierleague.com/api/entry/${Team.entry_id}/event/${Match.gameweek}`)
+          .then(async response => {
+            const { picks, subs } = response.data;
+            picks.map(pick => {
+              Pick.create({
+                PlayerId: pick.element,
+                MatchResultId: result.id
               });
-            })
-            .catch(e => {
-              console.log(e)
-            })
-        }
+            });
+          })
+          .catch(e => {
+            console.log(e)
+          })
       })
     })
 }
 
-if (process.env.import === 'test') {
-  MatchResult.findAll({
-    include: [
-      {
-        model: Team
-      },
-      {
-        model: MatchResult,
-        as: 'opponent',
-        where: {
-          id: {
-            [Op.ne]: sequelize.col('match_result.id')
-          }
-        },
-        include: [
-          {
-            model: Team
-          }
-        ]
-      }
-    ],
-    where: {
-      points: { [Op.gt]: 0 }
-    }
-  }).then(matchResults => {
-    matchResults.map(result => {
-      console.log(`${result.team.name}(${result.points}) vs ${result.opponent.team.name}(${result.opponent.points})`);
-    })
-  })
-}

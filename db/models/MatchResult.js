@@ -1,10 +1,94 @@
+const { Op } = require('sequelize');
 module.exports = (sequelize, type) => {
-  return sequelize.define('match_result', {
+  const MatchResult = sequelize.define('MatchResult', {
     id: {
       type: type.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
     points: type.INTEGER
+  }, {
+    defaultScope: {
+      where: {
+        points: { [Op.gt]: 0 }
+      }
+    }
   });
+
+  MatchResult.associate = ({ MatchResult, Team, Match, Pick }) => {
+    MatchResult.belongsTo(Team);
+    MatchResult.belongsTo(Match);
+    MatchResult.hasMany(Pick);
+    MatchResult.hasOne(MatchResult, {
+      as: 'opponent',
+      foreignKey: 'MatchId',
+      sourceKey: 'MatchId'
+    })
+  }
+
+  MatchResult.extend = (model) => {
+    /**
+     * Instance Methods
+     */
+    MatchResult.prototype.getOpponent = function () {
+      return MatchResult.findOne({
+        where: {
+          matchId: this.matchId,
+          id: {
+            [Op.ne]: this.id
+          }
+        }
+      });
+    }
+
+    /**
+     * Class Methods
+     */
+
+    /**
+     * Class Scopes
+     */
+    MatchResult.addScope('withTeam', {
+      include: [
+        {
+          model: model.Team,
+        }
+      ]
+    })
+
+    MatchResult.addScope('withMatch', {
+      include: [
+        {
+          model: model.Match,
+          as: 'match'
+        }
+      ]
+    })
+
+    MatchResult.addScope('withTeamAndMatch', {
+      include: [
+        {
+          model: model.Team,
+        },
+        {
+          model: model.Match,
+        }
+      ]
+    })
+
+    MatchResult.addScope('withOpponent', {
+      include: [
+        {
+          model: model.MatchResult,
+          as: 'opponent',
+          where: {
+            id: {
+              [Op.ne]: sequelize.col('MatchResult.id')
+            }
+          }
+        }
+      ]
+    })
+  }
+  return MatchResult
 };
