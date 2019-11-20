@@ -1,25 +1,15 @@
-const express = require('express');
-const next = require('next');
+const express = require('express')
+const exphbs = require('express-handlebars')
+const _ = require('lodash')
+const controller = require('./controllers')
+const app = express()
+const port = 3000
 
-const dev = process.env.NODE_ENV !== 'production';
-const PORT = process.env.PORT || 5000
-const app = next({ dev });
-const handle = app.getRequestHandler();
+// Register Handlebars view engine
+app.engine('.hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }));
+// Use Handlebars view engine
+app.set('view engine', '.hbs');
 
-app.prepare()
-	.then(() => {
-		const server = express();
+app.use('/', controller)
 
-		server.get('*', (req, res) => {
-			return handle(req, res)
-		})
-
-		server.listen(PORT, (err) => {
-			if (err) throw err
-			console.log(`> Ready on http://localhost:${PORT}`);
-		})
-	})
-	.catch((ex) => {
-		console.error(ex.stack)
-		process.exit(1);
-	})
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
