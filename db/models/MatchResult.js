@@ -84,7 +84,18 @@ module.exports = (sequelize, type) => {
             id: {
               [Op.ne]: sequelize.col('MatchResult.id')
             }
-          }
+          },
+          include: [
+            {
+              model: model.Team
+            }
+          ]
+        },
+        {
+          model: model.Team
+        },
+        {
+          model: model.Match
         }
       ]
     })
@@ -101,6 +112,10 @@ module.exports = (sequelize, type) => {
         }
       ],
       attributes: [
+        'points',
+        'id',
+        'TeamId',
+        'MatchId'
         [sequelize.literal('CASE WHEN MatchResult.points > Opponent.points THEN 3 WHEN MatchResult.points < Opponent.points THEN 0 ELSE 1 END'), 'matchPoint'],
         [sequelize.literal('CASE WHEN MatchResult.points > Opponent.points THEN "won" WHEN MatchResult.points < Opponent.points THEN "lost" ELSE "draw" END'), 'result']
       ]

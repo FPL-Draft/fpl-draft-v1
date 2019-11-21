@@ -1,5 +1,18 @@
-<ul>
-  {{#each teams}}
-  <li><a href="/team/{{id}}">{{name}} - {{getTotal}}</a></li>
-  {{/each}}
-</ul>
+<table>
+  <thead>
+    <tr>
+      <td>Name</td>
+      <td>+</td>
+      <td>Pts</td>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each teams}}
+    <tr>
+      <td><a href="/team/{{id}}">{{name}}</a></td>
+      <td>{{getFplPoints}}</td>
+      <td>{{getTotalPoints}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

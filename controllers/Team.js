@@ -5,7 +5,7 @@ const { Team } = require('../db/models')
 
 router.get('/:teamId', (req, res) => {
   const { teamId } = req.params
-  Team.findByPk(teamId)
+  Team.scope('withResults').findByPk(teamId)
     .then(team => {
       res.render('team', { team: team })
     })

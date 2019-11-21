@@ -4,13 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon index",
     "build": "DUMP=true import=all node import",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "import:teams": "import=teams node import",
-    "import:matches": "import=matches node import",
-    "import:players": "import=players node import",
-    "import:gw": "import=gw node import",
-    "import:test": "import=test node import",
     "database:refresh": "DUMP=true node ./db/models",
     "start": "node index"
   },

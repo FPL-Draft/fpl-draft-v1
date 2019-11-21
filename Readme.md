@@ -14,3 +14,8 @@ Start web server
 ```
 npm start
 ```
+
+Start dev web server
+```
+npm run dev
+```
