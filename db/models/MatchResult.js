@@ -20,7 +20,7 @@ module.exports = (sequelize, type) => {
     MatchResult.belongsTo(Match);
     MatchResult.hasMany(Pick);
     MatchResult.hasOne(MatchResult, {
-      as: 'opponent',
+      as: 'Opponent',
       foreignKey: 'MatchId',
       sourceKey: 'MatchId'
     })
@@ -60,7 +60,6 @@ module.exports = (sequelize, type) => {
       include: [
         {
           model: model.Match,
-          as: 'match'
         }
       ]
     })
@@ -80,7 +79,7 @@ module.exports = (sequelize, type) => {
       include: [
         {
           model: model.MatchResult,
-          as: 'opponent',
+          as: 'Opponent',
           where: {
             id: {
               [Op.ne]: sequelize.col('MatchResult.id')
@@ -89,6 +88,25 @@ module.exports = (sequelize, type) => {
         }
       ]
     })
+    MatchResult.addScope('withResults', {
+      include: [
+        {
+          model: model.MatchResult,
+          as: 'Opponent',
+          where: {
+            id: {
+              [Op.ne]: sequelize.col('MatchResult.id')
+            }
+          }
+        }
+      ],
+      attributes: [
+        [sequelize.literal('CASE WHEN MatchResult.points > Opponent.points THEN 3 WHEN MatchResult.points < Opponent.points THEN 0 ELSE 1 END'), 'matchPoint'],
+        [sequelize.literal('CASE WHEN MatchResult.points > Opponent.points THEN "won" WHEN MatchResult.points < Opponent.points THEN "lost" ELSE "draw" END'), 'result']
+      ]
+    })
   }
+
+
   return MatchResult
 };

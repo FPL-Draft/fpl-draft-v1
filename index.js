@@ -3,7 +3,7 @@ const exphbs = require('express-handlebars')
 const _ = require('lodash')
 const controller = require('./controllers')
 const app = express()
-const port = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000
 
 // Register Handlebars view engine
 app.engine('.hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }));
@@ -12,4 +12,4 @@ app.set('view engine', '.hbs');
 
 app.use('/', controller)
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))

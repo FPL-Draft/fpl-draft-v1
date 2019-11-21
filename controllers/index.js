@@ -5,9 +5,9 @@ const { Team } = require('../db/models')
 const TeamRoutes = require('./Team')
 // const ApiRoutes = require('./api')
 
-router.get('/', (req, res, next) => {
-  Team.findAll()
-    .then(teams => res.render('index', { teams: teams }))
+router.get('/', async (req, res, next) => {
+  const teams = await Team.scope('withResults').findAll()
+  res.render('index', { teams: teams })
 })
 
 router.use('/team', TeamRoutes)

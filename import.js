@@ -4,7 +4,12 @@ const { Op } = require('sequelize');
 const { MatchResult, Match, Team, Player, Pick } = require('./db/models');
 
 if (process.env.import === 'test') {
-
+  Team.scope('withResults').findAll()
+    .then(teams => {
+      teams.map(team => {
+        console.log(team.getTotal())
+      })
+    })
 }
 
 
