@@ -8,7 +8,8 @@ var db = {};
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './db/database.sqlite'
+  storage: './db/database.sqlite',
+  // logging: false
 });
 
 fs
@@ -31,10 +32,11 @@ Object.keys(db).forEach(modelName => {
 });
 
 if (process.env.DUMP) {
-  sequelize.sync({ force: true })
+  const ready = sequelize.sync({ force: true })
     .then(() => {
       console.log(`Database & tables created!`)
     });
+  db.ready = ready;
 }
 
 db.sequelize = sequelize;

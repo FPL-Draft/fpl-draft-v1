@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "setup": "npm run database:refresh && npm run import:teams && npm run import:matches",
+    "build": "DUMP=true import=all node import",
     "test": "echo \"Error: no test specified\" && exit 1",
     "import:teams": "import=teams node import",
     "import:matches": "import=matches node import",
