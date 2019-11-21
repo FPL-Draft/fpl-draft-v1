@@ -89,7 +89,6 @@ const executePicks = async () => {
   console.log('before:picks')
   await Promise.all(matchResults.map(async result => {
     const { Team, Match } = result;
-    console.log(`Team: ${Team.entry_id} - Gameweek: ${Match.gameweek}`);
 
     const response = await axios.get(`https://draft.premierleague.com/api/entry/${Team.entry_id}/event/${Match.gameweek}`);
     const { picks, subs } = response.data;
