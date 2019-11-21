@@ -5,19 +5,12 @@ This install the node packages the project need
 npm install
 ```
 
-This create/revert a empty database with the projects structure
+This imports the database
 ```
-npm run database:refresh
-```
-
-This imports the teams information from the api into the DB
-```
-npm run import:teams
+npm run build
 ```
 
-This imports the matches information from the api into the DB
+Start web server
 ```
-npm run import:matches
+npm start
 ```
-
-_Import must be split because javascripts is asynchronous_
