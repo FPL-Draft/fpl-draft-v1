@@ -3,3 +3,5 @@ package-lock.json
 db/database.sqlite
 .next/
 test.js
+.DS_Store
+db/.DS_Store
