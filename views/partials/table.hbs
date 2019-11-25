@@ -1,0 +1,30 @@
+<table>
+  <thead>
+    <tr>
+      <td>Names</td>
+      <td>+</td>
+      <td>-</td>
+      <td>+-</td>
+      <td>W</td>
+      <td>D</td>
+      <td>L</td>
+      <td>Form</td>
+      <td>Pts</td>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each teams}}
+    <tr>
+      <td><a href="/team/{{id}}">{{name}}</a></td>
+      <td>{{getFplPoints}}</td>
+      <td>{{getPointsAgainst}}</td>
+      <td>{{getPointsDifferene}}</td>
+      <td>{{getWins}}</td>
+      <td>{{getDraws}}</td>
+      <td>{{getLosses}}</td>
+      <td>{{getForm}}</td>
+      <td>{{getTotalPoints}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

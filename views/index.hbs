@@ -1,32 +1,3 @@
-<table>
-  <thead>
-    <tr>
-      <td>Name</td>
-      <td>+</td>
-      <td>-</td>
-      <td>+-</td>
-      <td>W</td>
-      <td>D</td>
-      <td>L</td>
-      <td>Form</td>
-      <td>Pts</td>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each teams}}
-    <tr>
-      <td><a href="/team/{{id}}">{{name}}</a></td>
-      <td>{{getFplPoints}}</td>
-      <td>{{getPointsAgaints}}</td>
-      <td>{{getPointsDifferene}}</td>
-      <td>{{getWins}}</td>
-      <td>{{getDraws}}</td>
-      <td>{{getLosses}}</td>
-      <td>{{getForm}}</td>
-      <td>{{getTotalPoints}}</td>
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
+{{> table }}
 
 <p><strong>Form:</strong> Calculated from average of last 5 gameweeks</p>
