@@ -15,8 +15,9 @@ module.exports = (sequelize, type) => {
 
   });
 
-  Player.associate = ({ Player, Pick }) => {
+  Player.associate = ({ Pick, PlayerStats }) => {
     Player.hasMany(Pick);
+    Player.hasMany(PlayerStats);
   }
 
   return Player;

@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { Op } = require('sequelize');
 // const { sequelize, Team, Match, MatchResult, Player, Pick } = require('./db');
-const { MatchResult, Match, Team, Player, Pick, ready } = require('./db/models');
+const { MatchResult, Match, Team, Player, Pick, PlayerStats, ready } = require('./db/models');
 
 if (process.env.import === 'test') {
   Team.scope('withResults').findAll()
@@ -102,17 +102,44 @@ const executePicks = async () => {
   console.log('after:picks')
 }
 
+const executePlayerStats = async () => {
+    console.log('executePlayerStats');
+    const players = await Player.findAll()
+    await Promise.all(players.map(async player => {
+      const response = await axios.get(`https://draft.premierleague.com/api/element-summary/${player.player_id}`);
+      const { history } = response.data;
+
+      await Promise.all(history.map(game => {
+        PlayerStats.create({
+          points: game.total_points,
+          assists: game.assists,
+          goals: game.goals_scored,
+          detail: game.detail,
+          gameweek: game.event,
+          PlayerId: player.id
+        })
+      }))
+    }))
+}
+
 const execute = async () => {
   await executeTeams();
   await executeMatches();
   await executePlayers();
   await executePicks();
+  await executePlayerStats();
 }
 
-ready.
-  then(() => {
-    execute();
-  })
+if (process.env.TEST) {
+  execute();
+} else {
+  ready.
+    then(() => {
+      execute();
+    })
+}
+
+
 /*
 axios.get('https://draft.premierleague.com/api/league/35400/details')
   .then(async (response) => {
