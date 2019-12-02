@@ -1,6 +1,6 @@
 <h2>{{ team.name }}</h2>
 <ul>
-  {{#each team.MatchResult}}
-  <li>{{Match.gameweek}} - {{Opponent.Team.name}}</li>
+  {{#each matches}}
+  <li>{{Match.gameweek}} - {{Opponent.Team.name}} - {{getResult}}</li>
   {{/each}}
 </ul>

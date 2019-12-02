@@ -8,11 +8,7 @@ module.exports = (sequelize, type) => {
     },
     points: type.INTEGER
   }, {
-    defaultScope: {
-      where: {
-        points: { [Op.gt]: 0 }
-      }
-    }
+
   });
 
   MatchResult.associate = ({ MatchResult, Team, Match, Pick }) => {
@@ -30,15 +26,24 @@ module.exports = (sequelize, type) => {
     /**
      * Instance Methods
      */
-    MatchResult.prototype.getOpponent = function () {
-      return MatchResult.findOne({
-        where: {
-          matchId: this.matchId,
-          id: {
-            [Op.ne]: this.id
-          }
-        }
-      });
+    MatchResult.prototype.getResult = function () {
+      if (this.points > this.Opponent.points)
+        return 'w'
+
+      if (this.points < this.Opponent.points)
+        return 'l'
+
+      return 'd'
+    }
+
+    MatchResult.prototype.getResultPoints = function () {
+      if (this.points > this.Opponent.points)
+        return 3
+
+      if (this.points < this.Opponent.points)
+        return 0
+
+      return 1
     }
 
     /**
@@ -48,37 +53,10 @@ module.exports = (sequelize, type) => {
     /**
      * Class Scopes
      */
-    MatchResult.addScope('withTeam', {
+    MatchResult.addScope('defaultScope', {
       include: [
         {
-          model: model.Team,
-        }
-      ]
-    })
-
-    MatchResult.addScope('withMatch', {
-      include: [
-        {
-          model: model.Match,
-        }
-      ]
-    })
-
-    MatchResult.addScope('withTeamAndMatch', {
-      include: [
-        {
-          model: model.Team,
-        },
-        {
-          model: model.Match,
-        }
-      ]
-    })
-
-    MatchResult.addScope('withOpponent', {
-      include: [
-        {
-          model: model.MatchResult,
+          model: model.MatchResult.unscoped(),
           as: 'Opponent',
           where: {
             id: {
@@ -97,29 +75,15 @@ module.exports = (sequelize, type) => {
         {
           model: model.Match
         }
-      ]
-    })
-    MatchResult.addScope('withResults', {
-      include: [
-        {
-          model: model.MatchResult,
-          as: 'Opponent',
-          where: {
-            id: {
-              [Op.ne]: sequelize.col('MatchResult.id')
-            }
-          }
-        }
       ],
-      attributes: [
-        'points',
-        'id',
-        'TeamId',
-        'MatchId'
-        [sequelize.literal('CASE WHEN MatchResult.points > Opponent.points THEN 3 WHEN MatchResult.points < Opponent.points THEN 0 ELSE 1 END'), 'matchPoint'],
-        [sequelize.literal('CASE WHEN MatchResult.points > Opponent.points THEN "won" WHEN MatchResult.points < Opponent.points THEN "lost" ELSE "draw" END'), 'result']
+      where: {
+        points: { [Op.gt]: 0 }
+      },
+      order: [
+        [sequelize.col('gameweek'), 'DESC'],
       ]
-    })
+    }, { override: true })
+
   }
 
 

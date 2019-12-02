@@ -3,12 +3,20 @@ const router = express.Router();
 
 const { Team } = require('../db/models')
 
-router.get('/:teamId', (req, res) => {
+router.get('/:teamId', async (req, res) => {
   const { teamId } = req.params
-  Team.scope('withResults').findByPk(teamId)
-    .then(team => {
-      res.render('team', { team: team })
+
+  try {
+    const team = await Team.findByPk(teamId)
+    const matches = await team.getMatchResults()
+
+    res.render('team', {
+      team, matches
     })
+  } catch (e) {
+    res.render('errors/404')
+  }
+
 })
 
 module.exports = router

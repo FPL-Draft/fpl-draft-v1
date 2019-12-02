@@ -14,7 +14,6 @@ module.exports = (sequelize, type) => {
 
   Team.associate = ({ Team, MatchResult }) => {
     Team.hasMany(MatchResult);
-    Team.hasMany(MatchResult.scope('withOpponent'), { as: 'MatchResult' })
   }
 
   Team.extend = (models) => {
@@ -64,7 +63,7 @@ module.exports = (sequelize, type) => {
     Team.addScope('withResults', {
       include: [
         {
-          model: models.MatchResult.scope('withOpponent'),
+          model: models.MatchResult,
           as: 'MatchResult'
         }
       ],
