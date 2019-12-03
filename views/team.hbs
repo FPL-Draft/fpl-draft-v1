@@ -1,6 +1,28 @@
-<h2>{{ team.name }}</h2>
-<ul>
-  {{#each matches}}
-  <li>{{Match.gameweek}} - {{Opponent.Team.name}} - {{getResult}}</li>
-  {{/each}}
-</ul>
+<div class="ui grid">
+  <div class="ui row">
+    <div class="column">
+      <h1>{{ team.name }}</h2>
+    </div>
+  </div>
+  <div class="ui row">
+    <div class="column">
+      <div class="ui segment">
+        <div class="ui top label">
+          FORM
+          <div class="detail">{{ form }}</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="ui row">
+    <div class="column">
+      <ul>
+        {{#each matches}}
+        <li>{{Match.gameweek}} - {{Opponent.Team.name}} - {{getResult}}</li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+
+</div>

@@ -10,6 +10,7 @@ app.engine('.hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }));
 // Use Handlebars view engine
 app.set('view engine', '.hbs');
 
+app.use('/semantic', express.static('semantic'))
 app.use('/', controller)
 
 app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))
