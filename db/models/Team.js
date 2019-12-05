@@ -36,7 +36,7 @@ module.exports = (sequelize, type) => {
       return this.get('pointsAgainst')
     }
 
-    Team.prototype.getPointsDifferene = function () {
+    Team.prototype.getPointsDifference = function () {
       return this.getFplPoints() - this.getPointsAgainst();
     }
 
