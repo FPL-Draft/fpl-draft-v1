@@ -58,14 +58,14 @@
         </thead>
         <tbody>
           {% for match in matches %}
-          {% set team = match.getTeamStats %}
+          {% set teamStats = match.getTeamStats %}
           <tr class="{% if match.getResult == 'w'%}positive{% elseif match.getResult == 'l' %}negative{% endif %}">
             <td>GW{{match.Match.gameweek}}</td>
             <td>{{match.points}}</td>
             <td>{{match.Opponent.Team.name}} ({{match.Opponent.points}})</td>
-            <td>{{team.getPosition}} ({{team.getForm}})</td>
-            <td>{{team.getFplPoints}}</td>
-            <td>{{team.getPointsDifference}}</td>
+            <td>{{teamStats.getPosition}} ({{teamStats.getForm}})</td>
+            <td>{{teamStats.getFplPoints}}</td>
+            <td>{{teamStats.getPointsDifference}}</td>
           </tr>
           {% endfor %}
         </tbody>

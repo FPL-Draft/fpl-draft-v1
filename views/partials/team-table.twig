@@ -1,20 +1,22 @@
 <table class="ui celled table">
   <thead>
     <tr>
-      <td>Names</td>
-      <td>+</td>
-      <td>-</td>
-      <td>+-</td>
-      <td>W</td>
-      <td>D</td>
-      <td>L</td>
-      <td>Form</td>
-      <td>Pts</td>
+      <th>Rank</td>
+      <th>Names</th>
+      <th>+</th>
+      <th>-</th>
+      <th>+-</th>
+      <th>W</th>
+      <th>D</th>
+      <th>L</th>
+      <th>Form</th>
+      <th>Pts</th>
     </tr>
   </thead>
   <tbody>
     {% for team in teams %}
       <tr>
+        <td>{{team.getPosition}}</td>
         <td><a href="/team/{{team.id}}">{{team.name}}</a></td>
         <td>{{team.getFplPoints}}</td>
         <td>{{team.getPointsAgainst}}</td>

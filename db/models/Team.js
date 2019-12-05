@@ -38,6 +38,10 @@ module.exports = (sequelize, type) => {
       return this.get('form')
     }
 
+    Team.prototype.getAveragePoints = function () {
+      return this.get('average')
+    }
+
     Team.prototype.getPointsAgainst = function () {
       return this.get('pointsAgainst')
     }
@@ -75,7 +79,7 @@ module.exports = (sequelize, type) => {
       const FromMatchResultQuery = `
       MatchResults as r
       INNER JOIN matches as m ON r.matchId = m.id 
-      INNER JOIN MatchResults as o ON r.matchId = o.matchId AND r.id != o.id 
+      INNER JOIN MatchResults as o ON r.OpponentId = o.id
       WHERE r.teamId = \`Team\`.\`id\` 
       AND r.points > 0
       AND finished = 1
@@ -125,6 +129,9 @@ module.exports = (sequelize, type) => {
           [sequelize.literal(`
             (SELECT sum(o.points) 
             FROM ${FromMatchResultQuery})`), 'pointsAgainst'],
+          [sequelize.literal(`
+            (SELECT avg(r.points) 
+            FROM ${FromMatchResultQuery})`), 'average'],
           [sequelize.literal(`
             (SELECT sum(won) 
             FROM (
