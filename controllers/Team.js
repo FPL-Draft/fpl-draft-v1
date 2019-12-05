@@ -9,24 +9,13 @@ router.get('/:teamId', async (req, res) => {
 
   try {
     await ready;
-    const team = await Team.scope('withStats').findByPk(teamId)
+    const team = await Team.findByPkWithStats(teamId)
     const matches = await team.getMatchResults()
 
     render(res, 'team', {
       team: team,
       matches: matches
     })
-    // res.render('team', {
-    //   team: team,
-    //   matches: matches,
-    //   form: team.getForm(),
-    //   position: team.getPosition(),
-    //   points: team.getTotalPoints(),
-    //   wins: team.getWins(),
-    //   losses: team.getLosses(),
-    //   draws: team.getDraws(),
-    //   fplPoints: team.getFplPoints(),
-    // })
   } catch (e) {
     render(res, 'errors/404')
   }

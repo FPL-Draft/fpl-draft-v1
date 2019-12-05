@@ -26,6 +26,7 @@ module.exports = (sequelize, type) => {
     }
 
     Team.prototype.getPosition = function () {
+
       return this.get('position')
     }
 
@@ -61,6 +62,10 @@ module.exports = (sequelize, type) => {
     /**
      * Class Methods
      */
+    Team.findByPkWithStats = async function (id) {
+      const teams = await models.Team.scope('withStats').findAll() // withStats Position only works with findAll
+      return teams.find(team => team.id == id)
+    }
 
     /**
      * Class Scopes
@@ -73,6 +78,7 @@ module.exports = (sequelize, type) => {
       INNER JOIN MatchResults as o ON r.matchId = o.matchId AND r.id != o.id 
       WHERE r.teamId = \`Team\`.\`id\` 
       AND r.points > 0
+      AND finished = 1
       ${filter}`;
 
       return ({
@@ -151,7 +157,8 @@ module.exports = (sequelize, type) => {
             ))`), 'losses'],
         ],
         where: {
-          '$MatchResults->Match.gameweek$': { [Op.lte]: gw }
+          '$MatchResults->Match.gameweek$': { [Op.lte]: gw },
+          '$MatchResults->Match.finished$': true
         },
         order: [
           [sequelize.col('totalPoints'), 'DESC'],
