@@ -44,6 +44,11 @@ module.exports = (sequelize, type) => {
       return 1
     }
 
+    MatchResult.prototype.getTeamStats = async function () {
+      const teams = await models.Team.scope({ method: ['withStats', this.Match.gameweek] }).findAll() // withStats Position only works with findAll
+      return teams.find(team => team.id == this.TeamId)
+    }
+
     /**
      * Class Methods
      */

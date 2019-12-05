@@ -151,7 +151,7 @@ module.exports = (sequelize, type) => {
             ))`), 'losses'],
         ],
         where: {
-          '$MatchResults->Match.gameweek$': { [Op.lt]: gw }
+          '$MatchResults->Match.gameweek$': { [Op.lte]: gw }
         },
         order: [
           [sequelize.col('totalPoints'), 'DESC'],

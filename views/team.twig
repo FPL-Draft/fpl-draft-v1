@@ -1,9 +1,9 @@
 {% extends "layouts/main.twig" %}
 
-{% block title %}Team{% endblock %}
+{% block title %}{{ team.name }}{% endblock %}
 
 {% block content %}
-  <div class="ui grid">
+<div class="ui grid">
   <div class="ui row">
     <div class="column">
       <h2 class="ui header">
@@ -47,17 +47,25 @@
       <table class="ui celled table">
         <thead>
           <tr>
-            <td>Gameweek</td>
-            <td>Points</td>
-            <td>Opponent (points)</td>
+            <th>Gameweek</th>
+            <th>Points</th>
+            <th>Opponent (points)</th>
+            <th>League Position (form)</th>
+            <th>Fantasy Points</th>
+            <th>Points Difference</th>
+            
           </tr>
         </thead>
         <tbody>
           {% for match in matches %}
+          {% set team = match.getTeamStats %}
           <tr class="{% if match.getResult == 'w'%}positive{% elseif match.getResult == 'l' %}negative{% endif %}">
             <td>GW{{match.Match.gameweek}}</td>
             <td>{{match.points}}</td>
             <td>{{match.Opponent.Team.name}} ({{match.Opponent.points}})</td>
+            <td>{{team.getPosition}} ({{team.getForm}})</td>
+            <td>{{team.getFplPoints}}</td>
+            <td>{{team.getPointsDifference}}</td>
           </tr>
           {% endfor %}
         </tbody>

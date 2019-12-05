@@ -5,4 +5,7 @@ let twing = new TwingEnvironment(loader);
 module.exports = (res, target, arguments = {}) => {
   twing.render(`${target}.twig`, arguments)
     .then(output => res.end(output))
+    .catch(e => {
+      console.log(e)
+    })
 }
