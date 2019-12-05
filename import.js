@@ -44,7 +44,7 @@ const executeMatches = async () => {
           team_id: fplMatch.league_entry_1
         }
       })
-      await MatchResult.create({
+      const homeResult = await MatchResult.create({
         points: fplMatch.league_entry_1_points,
         TeamId: homeTeam.id,
         MatchId: match.id
@@ -55,11 +55,14 @@ const executeMatches = async () => {
           team_id: fplMatch.league_entry_2
         }
       })
-      await MatchResult.create({
+      const awayResult = await MatchResult.create({
         points: fplMatch.league_entry_2_points,
         TeamId: awayTeam.id,
-        MatchId: match.id
+        MatchId: match.id,
+        OpponentId: homeResult.id
       })
+
+      await homeResult.update({ OpponentId: awayResult.id });
     })
   }));
   console.log('after:matches');
@@ -85,7 +88,7 @@ const executePlayers = async () => {
 
 const executePicks = async () => {
   console.log('executePicks');
-  const matchResults = await MatchResult.scope('withTeamAndMatch').findAll()
+  const matchResults = await MatchResult.findAll()
   console.log('before:picks')
   await Promise.all(matchResults.map(async result => {
     const { Team, Match } = result;
@@ -103,23 +106,25 @@ const executePicks = async () => {
 }
 
 const executePlayerStats = async () => {
-    console.log('executePlayerStats');
-    const players = await Player.findAll()
-    await Promise.all(players.map(async player => {
-      const response = await axios.get(`https://draft.premierleague.com/api/element-summary/${player.player_id}`);
-      const { history } = response.data;
+  console.log('executePlayerStats');
+  const players = await Player.findAll()
+  console.log('before:playerstats')
+  await Promise.all(players.map(async player => {
+    const response = await axios.get(`https://draft.premierleague.com/api/element-summary/${player.player_id}`);
+    const { history } = response.data;
 
-      await Promise.all(history.map(game => {
-        PlayerStats.create({
-          points: game.total_points,
-          assists: game.assists,
-          goals: game.goals_scored,
-          detail: game.detail,
-          gameweek: game.event,
-          PlayerId: player.id
-        })
-      }))
+    await Promise.all(history.map(game => {
+      PlayerStats.create({
+        points: game.total_points,
+        assists: game.assists,
+        goals: game.goals_scored,
+        detail: game.detail,
+        gameweek: game.event,
+        PlayerId: player.id
+      })
     }))
+  }))
+  console.log('after:playerstats')
 }
 
 const execute = async () => {

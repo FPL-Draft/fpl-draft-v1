@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 module.exports = (sequelize, type) => {
   const Team = sequelize.define('Team', {
     id: {
@@ -22,6 +23,10 @@ module.exports = (sequelize, type) => {
      */
     Team.prototype.getTotalPoints = function () {
       return this.get('totalPoints')
+    }
+
+    Team.prototype.getPosition = function () {
+      return this.get('position')
     }
 
     Team.prototype.getFplPoints = function () {
@@ -60,24 +65,8 @@ module.exports = (sequelize, type) => {
     /**
      * Class Scopes
      */
-    Team.addScope('withResults', {
-      include: [
-        {
-          model: models.MatchResult,
-          as: 'MatchResult'
-        }
-      ],
-      attributes: [
-        'name',
-        'entry_id',
-        'id',
-        [sequelize.literal('CASE WHEN MatchResult.points > `MatchResult->Opponent`.points THEN 3 WHEN MatchResult.points < `MatchResult->Opponent`.points THEN 0 ELSE 1 END'), 'MatchResult.matchPoint'],
-        [sequelize.literal('CASE WHEN MatchResult.points > `MatchResult->Opponent`.points THEN "won" WHEN MatchResult.points < `MatchResult->Opponent`.points THEN "lost" ELSE "draw" END'), 'MatchResult.result'],
-      ]
-    })
-
-    Team.addScope('withStats', (gw = false) => {
-      const filter = (gw) ? `AND gameweek <= ${gw}` : `AND 0 < gameweek`;
+    Team.addScope('withStats', (gw = 40) => {
+      const filter = `AND gameweek <= ${gw}`;
       const FromMatchResultQuery = `
       MatchResults as r
       INNER JOIN matches as m ON r.matchId = m.id 
@@ -87,10 +76,25 @@ module.exports = (sequelize, type) => {
       ${filter}`;
 
       return ({
+        include: [
+          {
+            model: models.MatchResult.scope('withOpponent')
+          }
+        ],
         attributes: [
           'name',
           'entry_id',
           'id',
+          [sequelize.literal(`
+            row_number() OVER(
+              order by 
+                SUM(
+                  CASE 
+                    WHEN \`MatchResults\`.\`points\` > \`MatchResults->Opponent\`.\`points\` THEN 3 
+                    WHEN \`MatchResults\`.\`points\` < \`MatchResults->Opponent\`.\`points\` THEN 0 
+                    ELSE 1 
+                  END) DESC, 
+                SUM(\`MatchResults\`.\`points\`) DESC)`), 'position'],
           [sequelize.literal(`
             (SELECT sum(r.points) 
             FROM ${FromMatchResultQuery})`), 'fplPoints'],
@@ -146,10 +150,14 @@ module.exports = (sequelize, type) => {
               FROM ${FromMatchResultQuery}
             ))`), 'losses'],
         ],
+        where: {
+          '$MatchResults->Match.gameweek$': { [Op.lt]: gw }
+        },
         order: [
           [sequelize.col('totalPoints'), 'DESC'],
           [sequelize.col('fplPoints'), 'DESC']
-        ]
+        ],
+        group: 'name'
       })
     })
   }

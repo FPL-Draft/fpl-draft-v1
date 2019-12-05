@@ -7,7 +7,7 @@ router.get('/gw/:gameweek', (req, res) => {
   const { gameweek } = req.params
   Team.scope({ method: ['withStats', gameweek] }).findAll()
     .then(teams => {
-      res.render(teams)
+      res.send(teams)
     })
 })
 

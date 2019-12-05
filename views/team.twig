@@ -1,0 +1,68 @@
+{% extends "layouts/main.twig" %}
+
+{% block title %}Team{% endblock %}
+
+{% block content %}
+  <div class="ui grid">
+  <div class="ui row">
+    <div class="column">
+      <h2 class="ui header">
+        <i class="icon circular">{{ team.position }}</i>
+        <div class="content">
+          {{ team.name }}
+        </div>
+      </h2>
+
+    </div>
+  </div>
+  <div class="ui row">
+    <div class="column">
+      <div class="ui segment">
+        <div class="ui yellow image label">
+          TOTAL POINTS
+          <div class="detail">{{ team.getTotalPoints }}</div>
+        </div>
+        <div class="ui blue image label">
+          FORM
+          <div class="detail">{{ team.getForm }}</div>
+        </div>
+        <div class="ui green image label">
+          WINS
+          <div class="detail">{{ team.getWins }}</div>
+        </div>
+        <div class="ui image label">
+          DRAWS
+          <div class="detail">{{ team.Draws }}</div>
+        </div>
+        <div class="ui red image label">
+          LOSSES
+          <div class="detail">{{ team.getLosses }}</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="ui row">
+    <div class="column">
+      <table class="ui celled table">
+        <thead>
+          <tr>
+            <td>Gameweek</td>
+            <td>Points</td>
+            <td>Opponent (points)</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for match in matches %}
+          <tr class="{% if match.getResult == 'w'%}positive{% elseif match.getResult == 'l' %}negative{% endif %}">
+            <td>GW{{match.Match.gameweek}}</td>
+            <td>{{match.points}}</td>
+            <td>{{match.Opponent.Team.name}} ({{match.Opponent.points}})</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

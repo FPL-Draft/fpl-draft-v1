@@ -16,13 +16,11 @@ module.exports = (sequelize, type) => {
     MatchResult.belongsTo(Match);
     MatchResult.hasMany(Pick);
     MatchResult.hasOne(MatchResult, {
-      as: 'Opponent',
-      foreignKey: 'MatchId',
-      sourceKey: 'MatchId'
+      as: 'Opponent'
     })
   }
 
-  MatchResult.extend = (model) => {
+  MatchResult.extend = (models) => {
     /**
      * Instance Methods
      */
@@ -56,24 +54,19 @@ module.exports = (sequelize, type) => {
     MatchResult.addScope('defaultScope', {
       include: [
         {
-          model: model.MatchResult.unscoped(),
+          model: models.MatchResult.unscoped(), // if not unscoped it will cuase infinite loop of including MatchResult Opponent
           as: 'Opponent',
-          where: {
-            id: {
-              [Op.ne]: sequelize.col('MatchResult.id')
-            }
-          },
           include: [
             {
-              model: model.Team
+              model: models.Team
             }
           ]
         },
         {
-          model: model.Team
+          model: models.Team
         },
         {
-          model: model.Match
+          model: models.Match
         }
       ],
       where: {
@@ -84,6 +77,20 @@ module.exports = (sequelize, type) => {
       ]
     }, { override: true })
 
+    MatchResult.addScope('withOpponent', {
+      include: [
+        {
+          model: models.MatchResult.unscoped(),
+          as: 'Opponent',
+        },
+        {
+          model: models.Match
+        }
+      ],
+      where: {
+        points: { [Op.gt]: 0 }
+      }
+    })
   }
 
 
