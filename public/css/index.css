@@ -1,21 +1,44 @@
 #graph {
   position: relative;
   height: calc(60px * 8);
+  margin: 50px 0;
+  border: 1px solid lightgrey;
 }
 
 #graph:after {
   content: "GW"attr(data-gameweek);
   position: absolute;
+  top: -50px;
   right: 0;
   font-size: 50px;
   line-height: 50px;
   border: 5px gray double;
   color: gray;
-
 }
+
+.graph-min, .graph-max {
+  position: absolute;
+  bottom: 0;
+}
+
+.graph-min {
+  left: 0
+}
+
+.graph-max {
+  right: 0
+}
+
 .team {
   position: absolute;
   left: 0;
   height: 50px;
   transition: all 2s linear;
+}
+
+.team:after {
+  content: attr(data-points);
+  position: absolute;
+  left: calc(100% + 5px);
+  line-height: 50px;
 }

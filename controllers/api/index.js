@@ -13,8 +13,10 @@ router.get('/gameweeks/tables', async (req, res) => {
     const table = await Team.scope({ method: ['withStats', gameweek] }).findAll()
     const minPoints = table.reduce((min, p) => p.getFplPoints() < min ? p.getFplPoints() : min, table[0].getFplPoints())
     const maxPoints = table.reduce((min, p) => p.getFplPoints() > min ? p.getFplPoints() : min, table[0].getFplPoints())
+    const minLeaguePoints = table.reduce((min, p) => p.getTotalPoints() < min ? p.getTotalPoints() : min, table[0].getTotalPoints())
+    const maxLeaguePoints = table.reduce((min, p) => p.getTotalPoints() > min ? p.getTotalPoints() : min, table[0].getTotalPoints())
     tables.push({
-      minPoints, maxPoints, gameweek, table
+      minPoints, maxPoints, minLeaguePoints, maxLeaguePoints, gameweek, table
     })
   }
   res.send(tables)

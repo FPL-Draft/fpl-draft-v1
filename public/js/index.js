@@ -27,9 +27,12 @@ String.prototype.toHexColour = function () {
   return intToARGB(hashCode(this));
 }
 $(document).ready(function () {
-  $graphContainer = $('#graph')
+  $graph = $('#graph')
+  $graphContainer = $graph.find('.graph-container')
+  $graphMin = $graph.find('.graph-min')
+  $graphMax = $graph.find('.graph-max')
   const createTeam = function (team) {
-    return `<div id="team-${team.id}" class="team" style="background: #${team.name.toHexColour()}; top: calc(60px * ${team.id}); width: 200px;">${team.name}</div>`;
+    return `<div id="team-${team.id}" data-points="0" class="team" style="background: #${team.name.toHexColour()}; top: calc(60px * ${team.id - 1}); width: 200px;">${team.name}</div>`;
   }
 
   const createGraph = function (table) {
@@ -42,6 +45,7 @@ $(document).ready(function () {
 
   const updateTeam = function (team, percentage) {
     $team = $(`#team-${team.id}`)
+    $team.attr('data-points', team.totalPoints)
     $team.css({
       'background': `#${team.name.toHexColour()}`,
       'top': `${((team.position - 1) * 60)}px`,
@@ -50,18 +54,20 @@ $(document).ready(function () {
   }
 
   const updateGraph = function (table, min, max, gameweek) {
-    $graphContainer.attr('data-gameweek', gameweek);
+    $graph.attr('data-gameweek', gameweek);
+    $graphMin.html(min);
+    $graphMax.html(max);
+    const range = max - min;
     for (const i in table) {
-      const percentage = ((table[i].fplPoints - min) / (max - min)) * 100;
-      console.log(gameweek, table[i].fplPoints, min, max, percentage)
+      const percentage = ((table[i].totalPoints - min) / (range)) * 100;
       updateTeam(table[i], percentage)
     }
   }
   const updateLoop = function (gameweeks, index) {
     setTimeout(function () {
-      const { table, minPoints, maxPoints, gameweek } = gameweeks[index];
-      const min = Math.floor(minPoints / 100) * 100;
-      const max = Math.ceil(maxPoints / 50) * 50;
+      const { table, minLeaguePoints, maxLeaguePoints, gameweek } = gameweeks[index];
+      const min = Math.floor(minLeaguePoints / 10) * 10;
+      const max = maxLeaguePoints + 3;//Math.ceil(maxLeaguePoints / 10) * 10;
       updateGraph(table, min, max, gameweek)
       index++
       if (gameweeks.length > index)
