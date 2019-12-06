@@ -19,5 +19,18 @@ module.exports = (sequelize, type) => {
     Match.hasMany(MatchResult);
   }
 
+  Match.extend = (models) => {
+    /**
+     * Class Scopes
+     */
+    Match.addScope('justGameweeks', {
+      where: {
+        finished: true
+      },
+      group: 'gameweek'
+    })
+  }
+
+
   return Match;
 };

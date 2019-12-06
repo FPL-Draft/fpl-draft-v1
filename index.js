@@ -5,6 +5,7 @@ const app = express()
 const PORT = process.env.PORT || 3000
 
 app.use('/semantic', express.static('semantic'))
+app.use('/public', express.static('public'))
 app.use('/', controller)
 
 app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`))

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index -e js,twig",
+    "dev": "nodemon index -e js,css,twig",
     "build": "DUMP=true import=all node import",
     "test": "echo \"Error: no test specified\" && exit 1",
     "stats": "TEST=true node import",
