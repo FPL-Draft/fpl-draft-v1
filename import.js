@@ -1,6 +1,5 @@
 const axios = require('axios');
 const { Op } = require('sequelize');
-// const { sequelize, Team, Match, MatchResult, Player, Pick } = require('./db');
 const { MatchResult, Match, Team, Player, Pick, PlayerStats, Club, ready } = require('./models');
 
 if (process.env.import === 'test') {
@@ -158,12 +157,12 @@ const executePlayerStats = async () => {
 }
 
 const execute = async () => {
-  // await executeTeams();
-  // await executeMatches();
+  await executeTeams();
+  await executeMatches();
   await executeClubs();
   await executePlayers();
-  // await executePicks();
-  // await executePlayerStats();
+  await executePicks();
+  await executePlayerStats();
 }
 
 if (process.env.TEST) {
