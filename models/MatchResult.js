@@ -11,10 +11,10 @@ module.exports = (sequelize, type) => {
 
   });
 
-  MatchResult.associate = ({ MatchResult, Team, Match, Pick }) => {
+  MatchResult.associate = ({ MatchResult, Team, Match, Pick, Player }) => {
     MatchResult.belongsTo(Team);
     MatchResult.belongsTo(Match);
-    MatchResult.hasMany(Pick);
+    MatchResult.belongsToMany(Player, { through: Pick });
     MatchResult.hasOne(MatchResult, {
       as: 'Opponent'
     })

@@ -9,7 +9,7 @@ var db = {};
 const sequelize = new Sequelize({
   dialect: 'sqlite',
   storage: './models/database.sqlite',
-  // logging: false
+  //logging: false
 });
 
 fs

@@ -10,8 +10,8 @@ module.exports = (sequelize, type) => {
   });
 
   Pick.associate = ({ Pick, Player, MatchResult }) => {
-    Pick.belongsTo(Player);
-    Pick.belongsTo(MatchResult);
+    // Pick.belongsTo(Player);
+    // Pick.belongsTo(MatchResult);
   }
 
   return Pick;

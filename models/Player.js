@@ -10,14 +10,19 @@ module.exports = (sequelize, type) => {
     assists: type.INTEGER,
     goals: type.INTEGER,
     first_name: type.STRING,
-    second_name: type.STRING
+    second_name: type.STRING,
+    name: type.STRING,
+    price: type.INTEGER,
+    selectedBy: type.DOUBLE,
+    club_id: type.INTEGER
   }, {
 
   });
 
-  Player.associate = ({ Pick, PlayerStats }) => {
-    Player.hasMany(Pick);
+  Player.associate = ({ Pick, PlayerStats, Club, MatchResult }) => {
+    Player.belongsToMany(MatchResult, { through: Pick });
     Player.hasMany(PlayerStats);
+    Player.belongsTo(Club, { foreignKey: 'club_id', targetKey: 'club_id' })
   }
 
   return Player;

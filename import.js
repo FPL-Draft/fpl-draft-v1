@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { Op } = require('sequelize');
 // const { sequelize, Team, Match, MatchResult, Player, Pick } = require('./db');
-const { MatchResult, Match, Team, Player, Pick, PlayerStats, ready } = require('./models');
+const { MatchResult, Match, Team, Player, Pick, PlayerStats, Club, ready } = require('./models');
 
 if (process.env.import === 'test') {
   Team.scope('withResults').findAll()
@@ -68,20 +68,49 @@ const executeMatches = async () => {
   console.log('after:matches');
 }
 
+const executeClubs = async () => {
+  console.log('executeClubs');
+  const response = await axios.get('https://fantasy.premierleague.com/api/bootstrap-static/')
+  const { teams } = response.data;
+  console.log('before:clubs')
+  await Promise.all(teams.map(async club => {
+    return Club.create({
+      club_id: club.id,
+      name: club.name,
+      strength_overall_home: club.strength_overall_home,
+      strength_overall_away: club.strength_overall_away,
+      strength_attack_home: club.strength_attack_home,
+      strength_attack_away: club.strength_attack_away,
+      strength_defence_home: club.strength_defence_home,
+      strength_defence_away: club.strength_defence_away
+    })
+  }))
+  console.log('after:clubs')
+}
+
 const executePlayers = async () => {
   console.log('executePlayers');
+  const fantasyResponse = await axios.get('https://fantasy.premierleague.com/api/bootstrap-static/')
+  const { elements: fantasyElements } = fantasyResponse.data
   const response = await axios.get('https://draft.premierleague.com/api/bootstrap-static')
   const { elements } = response.data;
   console.log('before:players')
   await Promise.all(elements.map(async (player) => {
-    await Player.create({
-      player_id: player.id,
-      points: player.total_points,
-      assists: player.assists,
-      goals: player.goals_scored,
-      first_name: player.first_name,
-      second_name: player.second_name
-    })
+    const fantasyPlayer = fantasyElements.find(fantasyPlayer => player.code == fantasyPlayer.code)
+    if (fantasyPlayer) {
+      await Player.create({
+        player_id: player.id,
+        points: player.total_points,
+        assists: player.assists,
+        goals: player.goals_scored,
+        first_name: player.first_name,
+        second_name: player.second_name,
+        name: player.web_name,
+        price: fantasyPlayer.now_cost,
+        selectedBy: fantasyPlayer.selected_by_percent,
+        club_id: fantasyPlayer.team
+      })
+    }
   }))
   console.log('after:players');
 }
@@ -107,14 +136,15 @@ const executePicks = async () => {
 
 const executePlayerStats = async () => {
   console.log('executePlayerStats');
+
   const players = await Player.findAll()
   console.log('before:playerstats')
   await Promise.all(players.map(async player => {
     const response = await axios.get(`https://draft.premierleague.com/api/element-summary/${player.player_id}`);
     const { history } = response.data;
 
-    await Promise.all(history.map(game => {
-      PlayerStats.create({
+    await Promise.all(history.map(async (game) => {
+      await PlayerStats.create({
         points: game.total_points,
         assists: game.assists,
         goals: game.goals_scored,
@@ -128,11 +158,12 @@ const executePlayerStats = async () => {
 }
 
 const execute = async () => {
-  await executeTeams();
-  await executeMatches();
+  // await executeTeams();
+  // await executeMatches();
+  await executeClubs();
   await executePlayers();
-  await executePicks();
-  await executePlayerStats();
+  // await executePicks();
+  // await executePlayerStats();
 }
 
 if (process.env.TEST) {
@@ -143,97 +174,3 @@ if (process.env.TEST) {
       execute();
     })
 }
-
-
-/*
-axios.get('https://draft.premierleague.com/api/league/35400/details')
-  .then(async (response) => {
-    const { league_entries, matches } = response.data;
-    if (process.env.import === 'teams') {
-      await league_entries.map(async (entry) => {
-        await Team.create({
-          team_id: entry.id,
-          entry_id: entry.entry_id,
-          name: entry.entry_name
-        })
-      });
-    } else if (process.env.import === 'matches') {
-      matches.map(async (fplMatch) => {
-        Match.create({
-          gameweek: fplMatch.event,
-          finished: fplMatch.finished
-        }).then(async match => {
-          const homeTeam = await Team.findOne({
-            where: {
-              team_id: fplMatch.league_entry_1
-            }
-          })
-          MatchResult.create({
-            points: fplMatch.league_entry_1_points,
-            TeamId: homeTeam.id,
-            MatchId: match.id
-          })
-
-          const awayTeam = await Team.findOne({
-            where: {
-              team_id: fplMatch.league_entry_2
-            }
-          })
-          MatchResult.create({
-            points: fplMatch.league_entry_2_points,
-            TeamId: awayTeam.id,
-            MatchId: match.id
-          })
-        })
-      });
-    }
-  })
-  .catch(error => {
-    console.log(error);
-  });
-
-if (process.env.import === 'players') {
-  axios.get('https://draft.premierleague.com/api/bootstrap-static')
-    .then(async (response) => {
-      const { elements } = response.data;
-      await elements.map(async (player) => {
-        Player.create({
-          player_id: player.id,
-          points: player.total_points,
-          assists: player.assists,
-          goals: player.goals_scored,
-          first_name: player.first_name,
-          second_name: player.second_name
-        })
-      });
-    })
-    .catch(error => {
-      console.log(error);
-    })
-}
-
-if (process.env.import === 'gw') {
-  MatchResult.scope('withTeamAndMatch').findAll()
-    .then(async matchResults => {
-      await matchResults.map(result => {
-        const { Team, Match } = result;
-        console.log(`Team: ${Team.entry_id} - Gameweek: ${Match.gameweek}`);
-
-        axios.get(`https://draft.premierleague.com/api/entry/${Team.entry_id}/event/${Match.gameweek}`)
-          .then(async response => {
-            const { picks, subs } = response.data;
-            picks.map(pick => {
-              Pick.create({
-                PlayerId: pick.element,
-                MatchResultId: result.id
-              });
-            });
-          })
-          .catch(e => {
-            console.log(e)
-          })
-      })
-    })
-}
-
-*/

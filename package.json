@@ -8,7 +8,7 @@
     "build": "DUMP=true import=all node import",
     "test": "echo \"Error: no test specified\" && exit 1",
     "stats": "TEST=true node import",
-    "database:refresh": "DUMP=true node ./db/models",
+    "database:refresh": "DUMP=true node ./models",
     "start": "node index"
   },
   "author": "",

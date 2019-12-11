@@ -1,6 +1,6 @@
 node_modules/
 package-lock.json
-db/database.sqlite
+models/database.sqlite
 .next/
 test.js
 .DS_Store
