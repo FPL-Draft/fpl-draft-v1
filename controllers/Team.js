@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const render = require('../helpers/Twing')
 
-const { Team, ready } = require('../db/models')
+const { Team, ready } = require('../models')
 
 router.get('/:teamId', async (req, res) => {
   const { teamId } = req.params

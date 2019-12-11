@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { Team } = require('../db/models')
+const { Team } = require('../models')
 const render = require('../helpers/Twing')
 
 const TeamRoutes = require('./Team')

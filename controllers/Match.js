@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { Team } = require('../db/models')
+const { Team } = require('../models')
 
 router.get('/gameweek/:gameweek', (req, res) => {
   const { gameweek } = req.params

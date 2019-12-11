@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
-const { Player, PlayerStats } = require('../db/models')
+const { Player, PlayerStats } = require('../models')
 
 router.get('/', (req, res) => {
   Player.findAll()
     .then(players => {
-    res.render('players', { players: players })
+      res.render('players', { players: players })
     })
 })
 

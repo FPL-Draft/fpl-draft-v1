@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { Op } = require('sequelize');
 // const { sequelize, Team, Match, MatchResult, Player, Pick } = require('./db');
-const { MatchResult, Match, Team, Player, Pick, PlayerStats, ready } = require('./db/models');
+const { MatchResult, Match, Team, Player, Pick, PlayerStats, ready } = require('./models');
 
 if (process.env.import === 'test') {
   Team.scope('withResults').findAll()

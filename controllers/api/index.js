@@ -2,7 +2,7 @@ const express = require('express');
 const _ = require('lodash')
 const router = express.Router();
 
-const { Team, Match } = require('../../db/models')
+const { Team, Match } = require('../../models')
 
 router.get('/gameweeks/tables', async (req, res) => {
   const matches = await Match.scope('justGameweeks').findAll()
