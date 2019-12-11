@@ -66,7 +66,7 @@ $(document).ready(function () {
   const updateLoop = function (gameweeks, index) {
     setTimeout(function () {
       const { table, minLeaguePoints, maxLeaguePoints, gameweek } = gameweeks[index];
-      const min = Math.floor(minLeaguePoints / 10) * 10;
+      const min = ((minLeaguePoints - 3) < 0) ? 0 : minLeaguePoints - 3;//Math.floor(minLeaguePoints / 10) * 10;
       const max = maxLeaguePoints + 3;//Math.ceil(maxLeaguePoints / 10) * 10;
       updateGraph(table, min, max, gameweek)
       index++
