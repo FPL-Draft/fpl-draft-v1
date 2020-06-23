@@ -52,6 +52,9 @@ module.exports = (sequelize, type) => {
     /**
      * Class Methods
      */
+    MatchResult.findMissing = async () => {
+      return await models.MatchResult.scope("defaultMissing").findAll()
+    }
 
     /**
      * Class Scopes
@@ -75,7 +78,7 @@ module.exports = (sequelize, type) => {
         }
       ],
       where: {
-        points: { [Op.gt]: 0 }
+        // points: { [Op.gt]: 0 }
       },
       order: [
         [sequelize.col('gameweek'), 'DESC'],
@@ -96,6 +99,32 @@ module.exports = (sequelize, type) => {
         points: { [Op.gt]: 0 }
       }
     })
+
+    MatchResult.addScope('defaultMissing', {
+      include: [
+        {
+          model: models.MatchResult.unscoped(), // if not unscoped it will cuase infinite loop of including MatchResult Opponent
+          as: 'Opponent',
+          include: [
+            {
+              model: models.Team
+            }
+          ]
+        },
+        {
+          model: models.Team
+        },
+        {
+          model: models.Match,
+          where: {
+            gameweek: {[Op.gt]: 29} 
+          }
+        }
+      ],
+      order: [
+        [sequelize.col('gameweek'), 'DESC'],
+      ]
+    }, { override: true })
   }
 
 

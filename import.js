@@ -3,12 +3,13 @@ const { Op } = require('sequelize');
 const { MatchResult, Match, Team, Player, Pick, PlayerStats, Club, ready } = require('./models');
 
 if (process.env.import === 'test') {
-  Team.scope('withResults').findAll()
-    .then(teams => {
-      teams.map(team => {
-        console.log(team.getTotal())
-      })
-    })
+  // Team.scope('withResults').findAll()
+  //   .then(teams => {
+  //     teams.map(team => {
+  //       console.log(team.getTotal())
+  //     })
+  //   })
+  // const missingMatches = await MatchResult.findMissing()
 }
 
 
@@ -160,9 +161,9 @@ const execute = async () => {
   await executeTeams();
   await executeMatches();
   await executeClubs();
-  await executePlayers();
-  await executePicks();
-  await executePlayerStats();
+  // await executePlayers();
+  // await executePicks();
+  // await executePlayerStats();
 }
 
 if (process.env.TEST) {

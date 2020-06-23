@@ -5,6 +5,7 @@ const render = require('../helpers/Twing')
 const { Team, ready } = require('../models')
 
 router.get('/:teamId', async (req, res) => {
+  sess = req.session
   const { teamId } = req.params
 
   try {
@@ -14,7 +15,8 @@ router.get('/:teamId', async (req, res) => {
 
     render(res, 'team', {
       team: team,
-      matches: matches
+      matches: matches,
+      admin: sess.admin
     })
   } catch (e) {
     render(res, 'errors/404')
