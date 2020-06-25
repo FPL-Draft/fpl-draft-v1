@@ -8,11 +8,7 @@ module.exports = (sequelize, type) => {
     gameweek: type.INTEGER,
     finished: type.BOOLEAN
   }, {
-    defaultScope: {
-      where: {
-        finished: true
-      }
-    }
+    
   });
 
   Match.associate = ({ Match, MatchResult }) => {
@@ -21,8 +17,22 @@ module.exports = (sequelize, type) => {
 
   Match.extend = (models) => {
     /**
+     * Instance Methods
+     */
+    Match.prototype.getGameweek = function () {
+      return (this.gameweek > 29) ? `${this.gameweek - 9}+` : this.gameweek
+    }
+    /**
      * Class Scopes
      */
+    Match.addScope('defaultScope', {
+      include: [
+        {
+          model: models.MatchResult.unscoped()
+        }
+      ],
+    }, { override: true })
+    
     Match.addScope('justGameweeks', {
       where: {
         finished: true

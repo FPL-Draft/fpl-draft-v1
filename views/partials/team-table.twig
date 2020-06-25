@@ -3,29 +3,33 @@
     <tr>
       <th>Rank</td>
       <th>Names</th>
-      <th>+</th>
-      <th>-</th>
-      <th>+-</th>
       <th>W</th>
       <th>D</th>
       <th>L</th>
-      <th>Form</th>
+      <th>+</th>
       <th>Pts</th>
+      {% if admin %}
+        <th>-</th>
+        <th>+-</th>
+        <th>Form</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody>
     {% for team in teams %}
       <tr>
         <td>{{team.getPosition}}</td>
-        <td><a href="/team/{{team.id}}">{{team.name}}</a></td>
-        <td>{{team.getFplPoints}}</td>
-        <td>{{team.getPointsAgainst}}</td>
-        <td>{{team.getPointsDifference}}</td>
+        <td><a href="/team/{{team.id}}">{{team.name}} ({{team.manager}})</a></td>
         <td>{{team.getWins}}</td>
         <td>{{team.getDraws}}</td>
         <td>{{team.getLosses}}</td>
-        <td>{{team.getForm}}</td>
+        <td>{{team.getFplPoints}}</td>
         <td>{{team.getTotalPoints}}</td>
+        {% if admin %}
+          <td>{{team.getPointsAgainst}}</td>
+          <td>{{team.getPointsDifference}}</td>
+          <td>{{team.getForm}}</td>
+        {% endif %}
       </tr>
     {% endfor %}
 

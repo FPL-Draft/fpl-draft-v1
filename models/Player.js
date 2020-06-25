@@ -25,5 +25,18 @@ module.exports = (sequelize, type) => {
     Player.belongsTo(Club, { foreignKey: 'club_id', targetKey: 'club_id' })
   }
 
+  Player.addScope('withStats', (gw = null) => {
+    return ({
+      include: [
+        {
+          model: models.PlayerStats,
+          where: {
+            gameweek: gw
+          }
+        }
+      ],
+    })
+  })
+
   return Player;
 };

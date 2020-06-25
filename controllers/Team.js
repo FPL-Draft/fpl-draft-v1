@@ -12,7 +12,6 @@ router.get('/:teamId', async (req, res) => {
     await ready;
     const team = await Team.findByPkWithStats(teamId)
     const matches = await team.getMatchResults()
-
     render(res, 'team', {
       team: team,
       matches: matches,

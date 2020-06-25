@@ -49,32 +49,29 @@
           <tr>
             <th>Gameweek</th>
             <th>Points</th>
-            <th>Opponent (points)</th>
-            <th>League Position (form)</th>
-            <th>Fantasy Points</th>
-            <th>Points Difference</th>
-            {% if admin %}<th>temp<th>{% endif %}
+            <th>Opponent</th>
+            <th>Points</th>
+            {% if admin %}
+              <th>League Position (form)</th>
+              <th>Fantasy Points</th>
+              <th>Points Difference</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody>
           {% for match in matches %}
           {% set teamStats = match.getTeamStats %}
-          <tr class="{% if match.getResult == 'w'%}positive{% elseif match.getResult == 'l' %}negative{% endif %}">
-            <td>GW{{match.Match.gameweek}}</td>
-            <td>{{match.points}}</td>
-            <td>{{match.Opponent.Team.name}} ({{match.Opponent.points}})</td>
-            <td>{{teamStats.getPosition}} ({{teamStats.getForm}})</td>
-            <td>{{teamStats.getFplPoints}}</td>
-            <td>{{teamStats.getPointsDifference}}</td>
-            {% if admin %}
-              <td>
-                <form action="/api/update/{{match.id}}" method="POST">
-                  <input name="points" type="number">
-                  <input type="submit" Value="submit">
-                </form>
-              </td>
-            {% endif %}
-          </tr>
+              <tr class="{% if match.getResult == 'w'%}positive{% elseif match.getResult == 'l' %}negative{% endif %}">
+                <td>GW{{match.Match.getGameweek}}</td>
+                <td>{{match.points}}</td>
+                <td>{{match.Opponent.Team.name}}</td>
+                <td>{{match.Opponent.points}}</td>
+                {% if admin %}
+                  <td>{{teamStats.getPosition}} ({{teamStats.getForm}})</td>
+                  <td>{{teamStats.getFplPoints}}</td>
+                  <td>{{teamStats.getPointsDifference}}</td>
+                {% endif %}
+              </tr>
           {% endfor %}
         </tbody>
       </table>

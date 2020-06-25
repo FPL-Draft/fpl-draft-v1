@@ -12,6 +12,43 @@ if (process.env.import === 'test') {
   // const missingMatches = await MatchResult.findMissing()
 }
 
+const updatePoints = async (newResult, gameweek) => {
+  if (gameweek > 47)
+    return
+  let points = 0
+  const { entry_id } = await newResult.getTeam() 
+  try {
+    const response = await axios.get(`https://draft.premierleague.com/api/entry/${entry_id}/event/${gameweek}`);
+    const { picks } = response.data
+    await Promise.all(picks.map( async pick => {
+      const played = (pick.position < 12)
+      await Pick.create({
+          PlayerId: pick.element,
+          MatchResultId: newResult.id,
+          played: played
+      }).then(async newPick => {
+        // Get player stats for game
+        if (newPick.played) {
+          const player = await Player.findOne({ where: { player_id: newPick.PlayerId }})
+          const matchStats = await PlayerStats.findAll({ where: {
+            PlayerId: player.id,
+            gameweek: gameweek
+          }})
+          matchStats.map(stat => {
+            points += stat.points
+          })
+        }
+      });
+    }));
+    newResult.points = points
+    newResult.save()
+  } catch(e) {
+
+  }
+  
+  newResult.points = points
+  newResult.update()
+}
 
 
 const executeTeams = async () => {
@@ -23,7 +60,8 @@ const executeTeams = async () => {
     return Team.create({
       team_id: entry.id,
       entry_id: entry.entry_id,
-      name: entry.entry_name
+      name: entry.entry_name,
+      manager: `${entry.player_first_name} ${entry.player_last_name}`
     })
   }))
   console.log('after:teams')
@@ -74,7 +112,7 @@ const executeClubs = async () => {
   const { teams } = response.data;
   console.log('before:clubs')
   await Promise.all(teams.map(async club => {
-    return Club.create({
+    await Club.create({
       club_id: club.id,
       name: club.name,
       strength_overall_home: club.strength_overall_home,
@@ -121,15 +159,17 @@ const executePicks = async () => {
   console.log('before:picks')
   await Promise.all(matchResults.map(async result => {
     const { Team, Match } = result;
-
     const response = await axios.get(`https://draft.premierleague.com/api/entry/${Team.entry_id}/event/${Match.gameweek}`);
     const { picks, subs } = response.data;
-    await Promise.all(picks.map(pick => {
-      return Pick.create({
-        PlayerId: pick.element,
-        MatchResultId: result.id
+    await Promise.all(picks.map( async pick => {
+      const played = (pick.position < 12)
+      await Pick.create({
+          PlayerId: pick.element,
+          MatchResultId: result.id,
+          played: played
       });
     }));
+
   }))
   console.log('after:picks')
 }
@@ -157,13 +197,49 @@ const executePlayerStats = async () => {
   console.log('after:playerstats')
 }
 
+const fixPrem = async () => {
+  console.log('fixPrem')
+  // Duplicate final matches
+  const newMatches = await Match.findAll({
+    where: {
+      gameweek: { [Op.gt]: 29 }
+    }
+  })
+  await Promise.all(newMatches.map(async match => {
+    const results = match.MatchResults
+    const gameweek = match.gameweek + 9
+    await Match.create({
+      gameweek: gameweek,
+      finished: true
+    }).then( async newMatch => {
+      const homeResult = await MatchResult.create({
+        points: 0, // calcualte if possible
+        TeamId: results[0].TeamId,
+        MatchId: newMatch.id,
+      })
+
+      const awayResult = await MatchResult.create({
+        points: 0, // calcualte if possible
+        TeamId: results[1].TeamId,
+        MatchId: newMatch.id,
+        OpponentId: homeResult.id
+      })
+
+      await homeResult.update({ OpponentId: awayResult.id });
+      await updatePoints(homeResult, gameweek)
+      await updatePoints(awayResult, gameweek)
+    })
+  }))
+}
+
 const execute = async () => {
   await executeTeams();
   await executeMatches();
   await executeClubs();
-  // await executePlayers();
-  // await executePicks();
-  // await executePlayerStats();
+  await executePlayers();
+  await executePicks();
+  await executePlayerStats();
+  await fixPrem();
 }
 
 if (process.env.TEST) {

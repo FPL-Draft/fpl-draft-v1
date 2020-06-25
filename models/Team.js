@@ -9,6 +9,7 @@ module.exports = (sequelize, type) => {
     team_id: type.INTEGER,
     entry_id: type.INTEGER,
     name: type.STRING,
+    manager: type.STRING
   }, {
 
   });
@@ -95,6 +96,7 @@ module.exports = (sequelize, type) => {
           'name',
           'entry_id',
           'id',
+          'manager',
           [sequelize.literal(`
             row_number() OVER(
               order by 

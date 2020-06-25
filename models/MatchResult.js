@@ -49,6 +49,11 @@ module.exports = (sequelize, type) => {
       return teams.find(team => team.id == this.TeamId)
     }
 
+    MatchResult.prototype.getPlayerPoints = async function () {
+      const players = await models.Player.scope({ method: ['withStats', this.Match.gameweek] })
+      return players
+    }
+
     /**
      * Class Methods
      */
@@ -74,7 +79,10 @@ module.exports = (sequelize, type) => {
           model: models.Team
         },
         {
-          model: models.Match
+          model: models.Match,
+          where: {
+            gameweek: { [Op.notBetween]: [30, 38] }
+          }
         }
       ],
       where: {
