@@ -64,7 +64,7 @@
               <tr class="{% if match.getResult == 'w'%}positive{% elseif match.getResult == 'l' %}negative{% endif %}">
                 <td>GW{{match.Match.getGameweek}}</td>
                 <td>{{match.points}}</td>
-                <td>{{match.Opponent.Team.name}}</td>
+                <td>{{match.Opponent.Team.name}} ({{match.Opponent.Team.manager}})</td>
                 <td>{{match.Opponent.points}}</td>
                 {% if admin %}
                   <td>{{teamStats.getPosition}} ({{teamStats.getForm}})</td>
