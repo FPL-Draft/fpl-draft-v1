@@ -8,8 +8,11 @@ router.get('/:teamId', async (req, res) => {
   sess = req.session
   const { teamId } = req.params
 
+
   try {
     await ready;
+    console.log('test')
+
     const team = await Team.findByPkWithStats(teamId)
     const matches = await team.getMatchResults()
     render(res, 'team', {
