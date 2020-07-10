@@ -200,6 +200,9 @@ const executePlayerStats = async () => {
 const fixPrem = async () => {
   console.log('fixPrem')
   // Duplicate final matches
+  const game = await axios.get(`https://draft.premierleague.com/api/game`);
+  const { current_event, current_event_finished } = game.data;
+  
   const newMatches = await Match.findAll({
     where: {
       gameweek: { [Op.gt]: 29 }
@@ -208,9 +211,11 @@ const fixPrem = async () => {
   await Promise.all(newMatches.map(async match => {
     const results = match.MatchResults
     const gameweek = match.gameweek + 9
+    const finished = (gameweek < current_event || (gameweek === current_event && current_event_finished))
+
     await Match.create({
-      gameweek: gameweek,
-      finished: true
+      gameweek,
+      finished
     }).then( async newMatch => {
       const homeResult = await MatchResult.create({
         points: 0, // calcualte if possible

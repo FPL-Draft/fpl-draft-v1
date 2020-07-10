@@ -75,7 +75,7 @@ module.exports = (sequelize, type) => {
     /**
      * Class Scopes
      */
-    Team.addScope('withStats', (gw = 42) => {
+    Team.addScope('withStats', (gw = 100) => {
       const filter = `AND gameweek <= ${gw}`;
       const FromMatchResultQuery = `
       MatchResults as r
@@ -170,8 +170,8 @@ module.exports = (sequelize, type) => {
           '$MatchResults->Match.finished$': true
         },
         order: [
-          [sequelize.col('fplPoints'), 'DESC'],
-          [sequelize.col('totalPoints'), 'DESC']
+          [sequelize.col('totalPoints'), 'DESC'],
+          [sequelize.col('fplPoints'), 'DESC']
         ],
         group: 'name'
       })
